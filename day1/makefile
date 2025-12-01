@@ -1,3 +1,3 @@
 build:
 	mkdir -p ../build
-	gcc -o ../build/main main.c -lm
+	gcc -o ../build/main main.c
