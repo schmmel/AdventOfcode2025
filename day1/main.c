@@ -20,11 +20,11 @@ int main()
             // printf("%d\n", ((dial + rotations) / 100) - (dial / 100));
 
             // dont count double if we start from 0
-            if (dial % 100 == 0 && (dial % 100) == ((dial + rotations) % 100))
-            {
-                // printf("-1 \n");
-                part2Count--;
-            }
+            // if (dial % 100 == 0 && (dial % 100) == ((dial + rotations) % 100))
+            // {
+            //     // printf("-1 \n");
+            //     part2Count--;
+            // }
 
             part2Count += ((dial + rotations) / 100) - (dial / 100);
 
