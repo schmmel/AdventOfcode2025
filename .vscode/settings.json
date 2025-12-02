@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.to": "dosato",
+        "text_encoding": "c",
+        "thread": "c"
+    }
+}
