@@ -62,9 +62,6 @@ int main()
 
                 // printf("%s %s\n", firstHalf, secondHalf);
 
-                // char firstHalf[] = i;
-                // printf("%s", firstHalf);
-
                 memset(firstHalf, 0, 64);
                 memset(secondHalf, 0, 64);
             }
