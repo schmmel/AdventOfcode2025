@@ -116,7 +116,7 @@ int main()
     part1Count += countAdjacencies(1);
 
     // part 2
-    int loopCount = part1Count;
+    int loopCount = 1;
 
     while (loopCount != 0)
     {
