@@ -1,50 +1,462 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MACHINECOUNT 199
 
-void nextPermutation(int buttonOrder[], int buttonCount)
+int pressButtons(int buttonCount, int buttonSize[], int buttons[][10], int machine, int deltaState[], int lightCount)
 {
-    int i = buttonCount - 2;
-    while (i >= 0 && buttonOrder[i] >= buttonOrder[i + 1])
-    {
-        i--;
-    }
+    int minPresses = 0;
+    int workingDeltaState[lightCount];
 
-    // last permutation surpassed
-    if (i < 0)
+    // 1 time
+    for (int i = 0; i < buttonCount; i++)
     {
-        // reset to original
-        for (int j = 0; j < buttonCount; j++)
+        // reset delta state
+        for (int z = 0; z < lightCount; z++)
         {
-            buttonOrder[j] = j;
+            workingDeltaState[z] = deltaState[z];
         }
 
-        return;
+        // press the button
+        for (int z = 0; z < buttonSize[i]; z++)
+        {
+            workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+        }
+
+        // check delta state
+        int wrongValues = 0;
+        for (int z = 0; z < lightCount; z++)
+        {
+            if (workingDeltaState[z] != 0)
+            {
+                wrongValues++;
+            }
+        }
+
+        if (wrongValues == 0)
+        {
+            minPresses = 1;
+            break;
+        }
     }
 
-    int j = buttonCount - 1;
-    while (buttonOrder[j] <= buttonOrder[i])
+    if (minPresses == 1)
     {
-        j--;
+        return 1;
     }
 
-    // swap
-    int temp = buttonOrder[i];
-    buttonOrder[i] = buttonOrder[j];
-    buttonOrder[j] = temp;
-
-    int left = i + 1, right = buttonCount - 1;
-    while (left < right)
+    // 2 times
+    for (int i = 0; i < buttonCount; i++)
     {
-        // swap
-        temp = buttonOrder[left];
-        buttonOrder[left] = buttonOrder[right];
-        buttonOrder[right] = temp;
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int z = 0; z < lightCount; z++)
+            {
+                workingDeltaState[z] = deltaState[z];
+            }
 
-        left++;
-        right--;
+            for (int z = 0; z < buttonSize[i]; z++)
+            {
+                workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+            }
+
+            for (int z = 0; z < buttonSize[j]; z++)
+            {
+                workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+            }
+
+            int wrongValues = 0;
+            for (int z = 0; z < lightCount; z++)
+            {
+                if (workingDeltaState[z] != 0)
+                {
+                    wrongValues++;
+                }
+            }
+
+            if (wrongValues == 0)
+            {
+                minPresses = 2;
+                break;
+            }
+        }
+        if (minPresses == 2)
+            break;
     }
+
+    if (minPresses == 2)
+    {
+        return 2;
+    }
+
+    // 3 times
+    for (int i = 0; i < buttonCount; i++)
+    {
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int k = 0; k < buttonCount; k++)
+            {
+                for (int z = 0; z < lightCount; z++)
+                {
+                    workingDeltaState[z] = deltaState[z];
+                }
+
+                for (int z = 0; z < buttonSize[i]; z++)
+                {
+                    workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+                }
+
+                for (int z = 0; z < buttonSize[j]; z++)
+                {
+                    workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+                }
+
+                for (int z = 0; z < buttonSize[k]; z++)
+                {
+                    workingDeltaState[buttons[k][z]] = !workingDeltaState[buttons[k][z]];
+                }
+
+                int wrongValues = 0;
+                for (int z = 0; z < lightCount; z++)
+                {
+                    if (workingDeltaState[z] != 0)
+                    {
+                        wrongValues++;
+                    }
+                }
+
+                if (wrongValues == 0)
+                {
+                    minPresses = 3;
+                    break;
+                }
+            }
+            if (minPresses == 3)
+                break;
+        }
+        if (minPresses == 3)
+            break;
+    }
+
+    if (minPresses == 3)
+    {
+        return 3;
+    }
+
+    // 4 times
+    for (int i = 0; i < buttonCount; i++)
+    {
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int k = 0; k < buttonCount; k++)
+            {
+                for (int l = 0; l < buttonCount; l++)
+                {
+                    for (int z = 0; z < lightCount; z++)
+                    {
+                        workingDeltaState[z] = deltaState[z];
+                    }
+
+                    for (int z = 0; z < buttonSize[i]; z++)
+                    {
+                        workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+                    }
+
+                    for (int z = 0; z < buttonSize[j]; z++)
+                    {
+                        workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+                    }
+
+                    for (int z = 0; z < buttonSize[k]; z++)
+                    {
+                        workingDeltaState[buttons[k][z]] = !workingDeltaState[buttons[k][z]];
+                    }
+
+                    for (int z = 0; z < buttonSize[l]; z++)
+                    {
+                        workingDeltaState[buttons[l][z]] = !workingDeltaState[buttons[l][z]];
+                    }
+
+                    int wrongValues = 0;
+                    for (int z = 0; z < lightCount; z++)
+                    {
+                        if (workingDeltaState[z] != 0)
+                        {
+                            wrongValues++;
+                        }
+                    }
+
+                    if (wrongValues == 0)
+                    {
+                        minPresses = 4;
+                        break;
+                    }
+                }
+                if (minPresses == 4)
+                    break;
+            }
+            if (minPresses == 4)
+                break;
+        }
+        if (minPresses == 4)
+            break;
+    }
+
+    if (minPresses == 4)
+    {
+        return 4;
+    }
+
+    // five times
+    for (int i = 0; i < buttonCount; i++)
+    {
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int k = 0; k < buttonCount; k++)
+            {
+                for (int l = 0; l < buttonCount; l++)
+                {
+                    for (int m = 0; m < buttonCount; m++)
+                    {
+                        for (int z = 0; z < lightCount; z++)
+                        {
+                            workingDeltaState[z] = deltaState[z];
+                        }
+
+                        for (int z = 0; z < buttonSize[i]; z++)
+                        {
+                            workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+                        }
+
+                        for (int z = 0; z < buttonSize[j]; z++)
+                        {
+                            workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+                        }
+
+                        for (int z = 0; z < buttonSize[k]; z++)
+                        {
+                            workingDeltaState[buttons[k][z]] = !workingDeltaState[buttons[k][z]];
+                        }
+
+                        for (int z = 0; z < buttonSize[l]; z++)
+                        {
+                            workingDeltaState[buttons[l][z]] = !workingDeltaState[buttons[l][z]];
+                        }
+
+                        for (int z = 0; z < buttonSize[m]; z++)
+                        {
+                            workingDeltaState[buttons[m][z]] = !workingDeltaState[buttons[m][z]];
+                        }
+
+                        int wrongValues = 0;
+                        for (int z = 0; z < lightCount; z++)
+                        {
+                            if (workingDeltaState[z] != 0)
+                            {
+                                wrongValues++;
+                            }
+                        }
+
+                        if (wrongValues == 0)
+                        {
+                            minPresses = 5;
+                            break;
+                        }
+                    }
+                    if (minPresses == 5)
+                        break;
+                }
+                if (minPresses == 5)
+                    break;
+            }
+            if (minPresses == 5)
+                break;
+        }
+        if (minPresses == 5)
+            break;
+    }
+
+    if (minPresses == 5)
+    {
+        return 5;
+    }
+
+    // six times
+    for (int i = 0; i < buttonCount; i++)
+    {
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int k = 0; k < buttonCount; k++)
+            {
+                for (int l = 0; l < buttonCount; l++)
+                {
+                    for (int m = 0; m < buttonCount; m++)
+                    {
+                        for (int n = 0; n < buttonCount; n++)
+                        {
+                            for (int z = 0; z < lightCount; z++)
+                            {
+                                workingDeltaState[z] = deltaState[z];
+                            }
+
+                            for (int z = 0; z < buttonSize[i]; z++)
+                            {
+                                workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+                            }
+
+                            for (int z = 0; z < buttonSize[j]; z++)
+                            {
+                                workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+                            }
+
+                            for (int z = 0; z < buttonSize[k]; z++)
+                            {
+                                workingDeltaState[buttons[k][z]] = !workingDeltaState[buttons[k][z]];
+                            }
+
+                            for (int z = 0; z < buttonSize[l]; z++)
+                            {
+                                workingDeltaState[buttons[l][z]] = !workingDeltaState[buttons[l][z]];
+                            }
+
+                            for (int z = 0; z < buttonSize[m]; z++)
+                            {
+                                workingDeltaState[buttons[m][z]] = !workingDeltaState[buttons[m][z]];
+                            }
+
+                            for (int z = 0; z < buttonSize[n]; z++)
+                            {
+                                workingDeltaState[buttons[n][z]] = !workingDeltaState[buttons[n][z]];
+                            }
+
+                            int wrongValues = 0;
+                            for (int z = 0; z < lightCount; z++)
+                            {
+                                if (workingDeltaState[z] != 0)
+                                {
+                                    wrongValues++;
+                                }
+                            }
+
+                            if (wrongValues == 0)
+                            {
+                                minPresses = 6;
+                                break;
+                            }
+                        }
+                        if (minPresses == 6)
+                            break;
+                    }
+                    if (minPresses == 6)
+                        break;
+                }
+                if (minPresses == 6)
+                    break;
+            }
+            if (minPresses == 6)
+                break;
+        }
+    }
+
+    if (minPresses == 6)
+    {
+        return 6;
+    }
+
+    // seven times
+    for (int i = 0; i < buttonCount; i++)
+    {
+        for (int j = 0; j < buttonCount; j++)
+        {
+            for (int k = 0; k < buttonCount; k++)
+            {
+                for (int l = 0; l < buttonCount; l++)
+                {
+                    for (int m = 0; m < buttonCount; m++)
+                    {
+                        for (int n = 0; n < buttonCount; n++)
+                        {
+                            for (int o = 0; o < buttonCount; o++)
+                            {
+                                for (int z = 0; z < lightCount; z++)
+                                {
+                                    workingDeltaState[z] = deltaState[z];
+                                }
+
+                                for (int z = 0; z < buttonSize[i]; z++)
+                                {
+                                    workingDeltaState[buttons[i][z]] = !workingDeltaState[buttons[i][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[j]; z++)
+                                {
+                                    workingDeltaState[buttons[j][z]] = !workingDeltaState[buttons[j][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[k]; z++)
+                                {
+                                    workingDeltaState[buttons[k][z]] = !workingDeltaState[buttons[k][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[l]; z++)
+                                {
+                                    workingDeltaState[buttons[l][z]] = !workingDeltaState[buttons[l][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[m]; z++)
+                                {
+                                    workingDeltaState[buttons[m][z]] = !workingDeltaState[buttons[m][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[n]; z++)
+                                {
+                                    workingDeltaState[buttons[n][z]] = !workingDeltaState[buttons[n][z]];
+                                }
+
+                                for (int z = 0; z < buttonSize[o]; z++)
+                                {
+                                    workingDeltaState[buttons[o][z]] = !workingDeltaState[buttons[o][z]];
+                                }
+
+                                int wrongValues = 0;
+                                for (int z = 0; z < lightCount; z++)
+                                {
+                                    if (workingDeltaState[z] != 0)
+                                    {
+                                        wrongValues++;
+                                    }
+                                }
+
+                                if (wrongValues == 0)
+                                {
+                                    minPresses = 7;
+                                    break;
+                                }
+                            }
+                            if (minPresses == 7)
+                                break;
+                        }
+                        if (minPresses == 7)
+                            break;
+                    }
+                    if (minPresses == 7)
+                        break;
+                }
+                if (minPresses == 7)
+                    break;
+            }
+            if (minPresses == 7)
+                break;
+        }
+    }
+
+    if (minPresses == 7)
+    {
+        return 7;
+    }
+
+    return 0;
 }
 
 int main()
@@ -106,34 +518,32 @@ int main()
         }
     }
 
+    // for (int i = 0; i < MACHINECOUNT; i++)
+    // {
+    //     printf("[");
+    //     for (int j = 0; j < lightCount[i]; j++)
+    //     {
+    //         printf("%d", indicators[i][j]);
+    //     }
+    //     printf("] ");
+
+    //     for (int j = 0; j < buttonCount[i]; j++)
+    //     {
+    //         printf("(");
+    //         for (int k = 0; k < buttonSize[i][j]; k++)
+    //         {
+    //             printf("%d,", buttons[i][j][k]);
+    //         }
+    //         printf(") ");
+    //     }
+
+    //     printf("%d", buttonCount[i]);
+
+    //     printf("\n");
+    // }
+
     for (int i = 0; i < MACHINECOUNT; i++)
     {
-        printf("[");
-        for (int j = 0; j < lightCount[i]; j++)
-        {
-            printf("%d", indicators[i][j]);
-        }
-        printf("] ");
-
-        for (int j = 0; j < buttonCount[i]; j++)
-        {
-            printf("(");
-            for (int k = 0; k < buttonSize[i][j]; k++)
-            {
-                printf("%d,", buttons[i][j][k]);
-            }
-            printf(") ");
-        }
-
-        printf("%d", buttonCount[i]);
-
-        printf("\n");
-    }
-
-    for (int i = 0; i < MACHINECOUNT; i++)
-    {
-        int minPresses = buttonCount[i];
-
         int deltaState[lightCount[i]];
         int workingDeltaState[lightCount[i]];
 
@@ -142,77 +552,14 @@ int main()
             deltaState[j] = indicators[i][j];
         }
 
-        // for (int j = 0; j < lightCount[i]; j++)
-        // {
-        //     printf("%d", deltaState[j]);
-        // }
+        int presses = pressButtons(buttonCount[i], buttonSize[i], buttons[i], i, deltaState, lightCount[i]);
 
-        // printf("\n");
-
-        // printf("%d\n", factorial(buttonCount[i]));
-
-        long long totalPermutations = 1;
-        int min = (buttonCount[i] < 11) ? buttonCount[i] : 11;
-        // printf("%d\n", min);
-        for (int j = 1; j <= min; j++)
+        if (presses == 0)
         {
-            totalPermutations *= j;
+            printf("machine %d presses %d\n\n", i, presses);
         }
 
-        int buttonOrder[buttonCount[i]];
-
-        for (int j = 0; j < buttonCount[i]; j++)
-        {
-            buttonOrder[j] = j;
-        }
-
-        for (long long j = 0; j < totalPermutations; j++)
-        {
-            for (int k = 0; k < lightCount[i]; k++)
-            {
-                workingDeltaState[k] = deltaState[k];
-            }
-
-            for (int k = 0; k < buttonCount[i] && k < minPresses; k++)
-            {
-                // printf("%d\n", buttonOrder[k]);
-
-                for (int l = 0; l < buttonSize[i][buttonOrder[k]]; l++)
-                {
-                    workingDeltaState[buttons[i][buttonOrder[k]][l]] = !workingDeltaState[buttons[i][buttonOrder[k]][l]];
-                    // printf("%d,", buttons[i][buttonOrder[k][l]);
-                }
-
-                int wrongValues = 0;
-                for (int l = 0; l < lightCount[i]; l++)
-                {
-                    if (workingDeltaState[l] != 0)
-                    {
-                        wrongValues++;
-                    }
-
-                    // printf("%d ", workingDeltaState[l]);
-                }
-
-                // printf("\n");
-
-                if (wrongValues == 0)
-                {
-                    minPresses = k + 1;
-                    // printf("correct %d\n", minPresses);
-                    break;
-                }
-
-                // printf("\n");
-            }
-            // printf("\n");
-
-            nextPermutation(buttonOrder, buttonCount[i]);
-        }
-
-        printf("%d %d\n", i, minPresses);
-
-        part1Count += minPresses;
+        part1Count += presses;
     }
 
     printf("part 1: %lld\n", part1Count);
