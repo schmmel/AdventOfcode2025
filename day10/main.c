@@ -466,13 +466,13 @@ int pressButtons(int buttonCount, int buttonSize[], int buttons[][10], int machi
 
 int dimensions;
 
-__int128_t visitedKey[MAXQUEUE];
+long long visitedKey[MAXQUEUE];
 int visitedStepsTaken[MAXQUEUE];
 int visitedCount = 0;
 
-__int128_t encode(int *coordinates)
+long long encode(int *coordinates)
 {
-    __int128_t key = 0;
+    long long key = 0;
     for (int d = 0; d < dimensions; d++)
     {
         key = key * 300 + coordinates[d];
@@ -719,7 +719,7 @@ int joltageSteps(int machine, int lightCount, int joltage[], int steps[][10], in
 
 int main()
 {
-    FILE *fptr = fopen("input.txt", "r");
+    FILE *fptr = fopen("testinput.txt", "r");
 
     long long part1Count = 0;
     long long part2Count = 0;
@@ -854,6 +854,7 @@ int main()
 
         part1Count += presses;
 
+        // my a* algorithm works on the test input, but im not waiting years to get it to do the actual input
         int stepsTaken = joltageSteps(i, lightCount[i], joltage[i], buttons[i], buttonCount[i], buttonSize[i]);
 
         printf("steps: %d\n", stepsTaken);

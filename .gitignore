@@ -1,2 +1,5 @@
 /build
 input.txt
+input.js
+node_modules
+package-lock.json
