@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MACHINECOUNT 199
+#define MACHINECOUNT 3
 
+// part 1 function
 int pressButtons(int buttonCount, int buttonSize[], int buttons[][10], int machine, int deltaState[], int lightCount)
 {
     int minPresses = 0;
@@ -459,6 +460,263 @@ int pressButtons(int buttonCount, int buttonSize[], int buttons[][10], int machi
     return 0;
 }
 
+#define MAXDIMENSIONS 10
+#define MAXOPTIONS 13
+#define MAXQUEUE 1000000
+
+int dimensions;
+
+__int128_t visitedKey[MAXQUEUE];
+int visitedStepsTaken[MAXQUEUE];
+int visitedCount = 0;
+
+__int128_t encode(int *coordinates)
+{
+    __int128_t key = 0;
+    for (int d = 0; d < dimensions; d++)
+    {
+        key = key * 300 + coordinates[d];
+    }
+    return key;
+}
+
+struct Node
+{
+    int coordinates[MAXDIMENSIONS];
+    int stepsTaken;
+    int score;
+};
+
+struct Node queue[MAXQUEUE];
+int queueSize = 0;
+
+int heuristic(int *coordinates, int *destination)
+{
+    int h = 0;
+    for (int d = 0; d < dimensions; d++)
+    {
+        int need = destination[d] - coordinates[d];
+        if (need > h)
+        {
+            h = need;
+        }
+    }
+    return h;
+}
+
+void enqueue(struct Node n)
+{
+    int index = queueSize++;
+    queue[index] = n;
+
+    while (index > 0)
+    {
+        int parentIndex = (index - 1) / 2;
+        if (queue[parentIndex].score <= queue[index].score)
+        {
+            break;
+        }
+
+        struct Node temp = queue[parentIndex];
+        queue[parentIndex] = queue[index];
+        queue[index] = temp;
+        index = parentIndex;
+    }
+}
+
+struct Node dequeue()
+{
+    struct Node min = queue[0];
+    queueSize--;
+    queue[0] = queue[queueSize];
+
+    int index = 0;
+    while (1)
+    {
+        int leftIndex = index * 2 + 1;
+        int rightIndex = index * 2 + 2;
+        int smallest = index;
+
+        if (leftIndex < queueSize && queue[leftIndex].score < queue[smallest].score)
+        {
+            smallest = leftIndex;
+        }
+        if (rightIndex < queueSize && queue[rightIndex].score < queue[smallest].score)
+        {
+            smallest = rightIndex;
+        }
+
+        if (smallest == index)
+        {
+            break;
+        }
+
+        struct Node temp = queue[index];
+        queue[index] = queue[smallest];
+        queue[smallest] = temp;
+
+        index = smallest;
+    }
+
+    return min;
+}
+
+int exceedsDestination(int *coordinates, int *destination)
+{
+    for (int d = 0; d < dimensions; d++)
+    {
+        if (coordinates[d] > destination[d])
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int compareCoords(int *coordinatesA, int *coordinatesB)
+{
+    for (int d = 0; d < dimensions; d++)
+    {
+        if (coordinatesA[d] != coordinatesB[d])
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int AStar(int stepOptions, int steps[MAXOPTIONS][MAXDIMENSIONS], int *start, int *destination)
+{
+    queueSize = 0;
+    visitedCount = 0;
+
+    struct Node startNode;
+    memcpy(startNode.coordinates, start, sizeof(int) * dimensions);
+    startNode.stepsTaken = 0;
+    startNode.score = heuristic(startNode.coordinates, destination);
+
+    enqueue(startNode);
+
+    // int current[MAXDIMENSIONS];
+    int stepCount = 0;
+
+    while (queueSize > 0)
+    {
+        struct Node current = dequeue();
+
+        // printf("%d %d\n", queueSize, current.score);
+
+        if (compareCoords(current.coordinates, destination))
+        {
+            return current.stepsTaken;
+        }
+
+        for (int i = 0; i < stepOptions; i++)
+        {
+            int neighbor[MAXDIMENSIONS];
+
+            for (int d = 0; d < dimensions; d++)
+            {
+                neighbor[d] = current.coordinates[d] + steps[i][d];
+            }
+
+            if (exceedsDestination(neighbor, destination))
+            {
+                continue;
+            }
+
+            __int128_t key = encode(neighbor);
+            int alreadyVisited = 0;
+
+            for (int j = 0; j < visitedCount; j++)
+            {
+                if (visitedKey[j] == key && visitedStepsTaken[j] <= current.stepsTaken + 1)
+                {
+                    alreadyVisited = 1;
+                    break;
+                }
+            }
+
+            if (!alreadyVisited)
+            {
+                visitedKey[visitedCount] = key;
+                visitedStepsTaken[visitedCount] = current.stepsTaken + 1;
+                visitedCount++;
+
+                struct Node neighborNode;
+                memcpy(neighborNode.coordinates, neighbor, sizeof(int) * dimensions);
+                neighborNode.stepsTaken = current.stepsTaken + 1;
+                neighborNode.score = neighborNode.stepsTaken + heuristic(neighbor, destination);
+
+                enqueue(neighborNode);
+            }
+        }
+    }
+
+    return -1;
+}
+
+int joltageSteps(int machine, int lightCount, int joltage[], int steps[][10], int stepOptions, int stepDimensions[])
+{
+    int formattedSteps[MAXOPTIONS][MAXDIMENSIONS] = {0};
+    int start[MAXDIMENSIONS] = {0};
+    int destination[MAXDIMENSIONS] = {0};
+
+    for (int i = 0; i < lightCount; i++)
+    {
+        destination[i] = joltage[i];
+    }
+
+    for (int i = 0; i < stepOptions; i++)
+    {
+        for (int j = 0; j < stepDimensions[i]; j++)
+        {
+            formattedSteps[i][steps[i][j]] = 1;
+        }
+    }
+
+    // printf("%d \n", machine);
+
+    // printf("  start: ");
+    // for (int d = 0; d < dimensions; d++)
+    // {
+    //     printf("000 ");
+    // }
+    // printf("end: ");
+    // for (int i = 0; i < lightCount; i++)
+    // {
+    //     printf("%03d ", joltage[i]);
+    // }
+    // printf("\noptions: ");
+
+    // for (int i = 0; i < stepOptions; i++)
+    // {
+    //     printf("(");
+    //     for (int j = 0; j < stepDimensions[i]; j++)
+    //     {
+    //         printf("%d,", steps[i][j]);
+    //     }
+    //     printf(") ");
+    // }
+
+    // printf("\n");
+
+    // for (int i = 0; i < stepOptions; i++)
+    // {
+    //     printf("(");
+    //     for (int j = 0; j < MAXDIMENSIONS; j++)
+    //     {
+    //         printf("%d,", formattedSteps[i][j]);
+    //     }
+    //     printf(") ");
+    // }
+
+    // printf("\n");
+
+    dimensions = lightCount;
+    return AStar(stepOptions, formattedSteps, start, destination);
+}
+
 int main()
 {
     FILE *fptr = fopen("input.txt", "r");
@@ -472,6 +730,8 @@ int main()
     int buttonCount[MACHINECOUNT] = {0};
     int buttonSize[MACHINECOUNT][32] = {0};
     int buttons[MACHINECOUNT][32][10];
+
+    int joltage[MACHINECOUNT][10];
 
     char buffer[640];
 
@@ -516,8 +776,33 @@ int main()
             }
             bufferIndex++;
         }
+
+        bufferIndex++;
+
+        int joltageIndex = 0;
+        char joltageBuffer[4];
+        int jb = 0;
+        while (buffer[bufferIndex] != '}')
+        {
+            if (buffer[bufferIndex] != ',')
+            {
+                joltageBuffer[jb] = buffer[bufferIndex];
+                jb++;
+            }
+            else
+            {
+                joltage[i][joltageIndex] = atoi(joltageBuffer);
+                memset(joltageBuffer, 0, 4);
+                joltageIndex++;
+                jb = 0;
+            }
+            bufferIndex++;
+        }
+
+        joltage[i][joltageIndex] = atoi(joltageBuffer);
     }
 
+    // // printer
     // for (int i = 0; i < MACHINECOUNT; i++)
     // {
     //     printf("[");
@@ -537,10 +822,18 @@ int main()
     //         printf(") ");
     //     }
 
-    //     printf("%d", buttonCount[i]);
+    //     printf("{");
+    //     for (int j = 0; j < lightCount[i]; j++)
+    //     {
+    //         printf("%d,", joltage[i][j]);
+    //     }
+    //     printf("}");
+
+    //     // printf("%d", buttonCount[i]);
 
     //     printf("\n");
     // }
+    // printf("\n");
 
     for (int i = 0; i < MACHINECOUNT; i++)
     {
@@ -560,6 +853,12 @@ int main()
         }
 
         part1Count += presses;
+
+        int stepsTaken = joltageSteps(i, lightCount[i], joltage[i], buttons[i], buttonCount[i], buttonSize[i]);
+
+        printf("steps: %d\n", stepsTaken);
+
+        part2Count += stepsTaken;
     }
 
     printf("part 1: %lld\n", part1Count);
